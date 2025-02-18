@@ -3,30 +3,34 @@
 <head>
     <title>Habitación VR con A-Frame</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <!-- Añade el componente de locomoción -->
-    <script src="https://unpkg.com/aframe-locomotion-component@0.5.0/dist/aframe-locomotion-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    <script>
+        // Solicitar permisos de WebXR al cargar la página
+        if (navigator.xr) {
+            navigator.xr.requestSession('immersive-vr').then((session) => {
+                console.log('WebXR session started');
+            }).catch((error) => {
+                console.error('Error starting WebXR session:', error);
+            });
+        } else {
+            console.error('WebXR no está soportado en este navegador');
+        }
+    </script>
 </head>
 <body>
     <a-scene>
         <!-- Cámara y controles para VR -->
-        <a-entity camera look-controls position="0 1.6 0">
+        <a-entity camera look-controls position="0 1.6 0" movement-controls="speed: 0.1;">
             <!-- Mando izquierdo: Movimiento con el joystick -->
-            <a-entity oculus-touch-controls="hand: left" locomotion="type: teleport; speed: 0.1;"></a-entity>
+            <a-entity oculus-touch-controls="hand: left"></a-entity>
             <!-- Mando derecho: Rotación con el joystick -->
-            <a-entity oculus-touch-controls="hand: right" locomotion="type: smooth; speed: 0.1;"></a-entity>
+            <a-entity oculus-touch-controls="hand: right"></a-entity>
         </a-entity>
 
         <!-- Paredes de la habitación con diferentes colores -->
-        <!-- Pared frontal (Z negativo) -->
         <a-box position="0 2.5 -5" rotation="0 0 0" width="10" height="5" depth="0.1" color="#FF0000"></a-box> <!-- Rojo -->
-        
-        <!-- Pared trasera (Z positivo) -->
         <a-box position="0 2.5 5" rotation="0 0 0" width="10" height="5" depth="0.1" color="#00FF00"></a-box> <!-- Verde -->
-        
-        <!-- Pared izquierda (X negativo) -->
         <a-box position="-5 2.5 0" rotation="0 90 0" width="10" height="5" depth="0.1" color="#0000FF"></a-box> <!-- Azul -->
-        
-        <!-- Pared derecha (X positivo) -->
         <a-box position="5 2.5 0" rotation="0 90 0" width="10" height="5" depth="0.1" color="#FFFF00"></a-box> <!-- Amarillo -->
 
         <!-- Suelo -->
