@@ -2,10 +2,10 @@
 <html>
 <head>
     <title>Habitación VR con A-Frame</title>
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <meta name="description" content="Experiencia VR inmersiva con A-Frame">
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
     <style>
-        /* Estilos para el menú de inicio */
         #start-menu {
             position: absolute;
             top: 50%;
@@ -31,66 +31,66 @@
     </style>
 </head>
 <body>
-    <!-- Menú de inicio -->
     <div id="start-menu">
         <h1>Bienvenido a la experiencia VR</h1>
         <button id="start-button">Iniciar experiencia</button>
     </div>
 
-    <!-- Escena de A-Frame (oculta inicialmente) -->
     <a-scene style="display: none;">
-        <!-- Cámara y controles para VR -->
-        <a-entity camera look-controls position="0 1.6 0" movement-controls="speed: 0.1;">
-            <!-- Mando izquierdo: Movimiento con el joystick -->
-            <a-entity oculus-touch-controls="hand: left"></a-entity>
-            <!-- Mando derecho: Rotación con el joystick -->
-            <a-entity oculus-touch-controls="hand: right"></a-entity>
+        <a-entity id="cameraRig">
+            <a-entity camera look-controls position="0 1.6 0" movement-controls="speed: 0.1;">
+                <a-entity oculus-touch-controls="hand: left"></a-entity>
+                <a-entity oculus-touch-controls="hand: right"></a-entity>
+            </a-entity>
         </a-entity>
 
-        <!-- Paredes de la habitación con diferentes colores -->
-        <a-box position="0 2.5 -5" rotation="0 0 0" width="10" height="5" depth="0.1" color="#FF0000"></a-box> <!-- Rojo -->
-        <a-box position="0 2.5 5" rotation="0 0 0" width="10" height="5" depth="0.1" color="#00FF00"></a-box> <!-- Verde -->
-        <a-box position="-5 2.5 0" rotation="0 90 0" width="10" height="5" depth="0.1" color="#0000FF"></a-box> <!-- Azul -->
-        <a-box position="5 2.5 0" rotation="0 90 0" width="10" height="5" depth="0.1" color="#FFFF00"></a-box> <!-- Amarillo -->
+        <a-box position="0 2.5 -5" rotation="0 0 0" width="10" height="5" depth="0.1" color="#FF0000"></a-box>
+        <a-box position="0 2.5 5" rotation="0 0 0" width="10" height="5" depth="0.1" color="#00FF00"></a-box>
+        <a-box position="-5 2.5 0" rotation="0 90 0" width="10" height="5" depth="0.1" color="#0000FF"></a-box>
+        <a-box position="5 2.5 0" rotation="0 90 0" width="10" height="5" depth="0.1" color="#FFFF00"></a-box>
 
-        <!-- Suelo -->
         <a-plane position="0 0 0" rotation="-90 0 0" width="10" height="10" color="#7BC8A4"></a-plane>
-
-        <!-- Cielo -->
         <a-sky color="#ECECEC"></a-sky>
 
-        <!-- Iluminación -->
         <a-entity light="type: ambient; color: #ccc"></a-entity>
         <a-entity light="type: directional; color: #fff; intensity: 0.9" position="1 1 0"></a-entity>
     </a-scene>
 
     <script>
-        // Obtener referencias al menú y a la escena
         const startMenu = document.getElementById('start-menu');
         const startButton = document.getElementById('start-button');
         const scene = document.querySelector('a-scene');
+        const cameraRig = document.getElementById('cameraRig'); // Obtener el rig de la cámara
 
-        // Función para iniciar la experiencia
         startButton.addEventListener('click', async () => {
-            // Verificar si WebXR está disponible
+            console.log("Iniciando experiencia VR...");
+
+            if (navigator.xr && navigator.xr.getDisplays && navigator.xr.getDisplays().length > 0) {
+                console.log("Casco VR detectado.");
+            } else {
+                alert("No se detectó ningún casco VR. Por favor, conecta tu casco.");
+                return;
+            }
+
             if (navigator.xr) {
                 try {
-                    // Solicitar una sesión de WebXR
+                    console.log("Solicitando sesión WebXR...");
                     const session = await navigator.xr.requestSession('immersive-vr');
-                    console.log('WebXR session started');
+                    console.log('Sesión WebXR iniciada:', session);
 
-                    // Ocultar el menú de inicio
+                    // Asignar la sesión al canvas de A-Frame
+                    scene.canvas.xrSession = session;
+
                     startMenu.style.display = 'none';
-
-                    // Mostrar la escena de A-Frame
                     scene.style.display = 'block';
+
                 } catch (error) {
-                    console.error('Error al iniciar la sesión de WebXR:', error);
-                    alert('No se pudo iniciar la experiencia VR. Asegúrate de permitir los permisos necesarios.');
+                    console.error('Error al iniciar la sesión WebXR:', error);
+                    alert('Error al iniciar la VR: ' + error.message);
                 }
             } else {
-                console.error('WebXR no está soportado en este navegador');
-                alert('Tu navegador no soporta WebXR. Usa Oculus Browser o Firefox Reality.');
+                console.error('WebXR no es compatible.');
+                alert('Tu navegador no es compatible con WebXR.');
             }
         });
     </script>
