@@ -4,21 +4,41 @@
     <title>Habitación VR con A-Frame</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-    <script>
-        // Solicitar permisos de WebXR al cargar la página
-        if (navigator.xr) {
-            navigator.xr.requestSession('immersive-vr').then((session) => {
-                console.log('WebXR session started');
-            }).catch((error) => {
-                console.error('Error starting WebXR session:', error);
-            });
-        } else {
-            console.error('WebXR no está soportado en este navegador');
+    <style>
+        /* Estilos para el menú de inicio */
+        #start-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            z-index: 1000;
         }
-    </script>
+        #start-button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <a-scene>
+    <!-- Menú de inicio -->
+    <div id="start-menu">
+        <h1>Bienvenido a la experiencia VR</h1>
+        <button id="start-button">Iniciar experiencia</button>
+    </div>
+
+    <!-- Escena de A-Frame (oculta inicialmente) -->
+    <a-scene style="display: none;">
         <!-- Cámara y controles para VR -->
         <a-entity camera look-controls position="0 1.6 0" movement-controls="speed: 0.1;">
             <!-- Mando izquierdo: Movimiento con el joystick -->
@@ -43,5 +63,36 @@
         <a-entity light="type: ambient; color: #ccc"></a-entity>
         <a-entity light="type: directional; color: #fff; intensity: 0.9" position="1 1 0"></a-entity>
     </a-scene>
+
+    <script>
+        // Obtener referencias al menú y a la escena
+        const startMenu = document.getElementById('start-menu');
+        const startButton = document.getElementById('start-button');
+        const scene = document.querySelector('a-scene');
+
+        // Función para iniciar la experiencia
+        startButton.addEventListener('click', async () => {
+            // Verificar si WebXR está disponible
+            if (navigator.xr) {
+                try {
+                    // Solicitar una sesión de WebXR
+                    const session = await navigator.xr.requestSession('immersive-vr');
+                    console.log('WebXR session started');
+
+                    // Ocultar el menú de inicio
+                    startMenu.style.display = 'none';
+
+                    // Mostrar la escena de A-Frame
+                    scene.style.display = 'block';
+                } catch (error) {
+                    console.error('Error al iniciar la sesión de WebXR:', error);
+                    alert('No se pudo iniciar la experiencia VR. Asegúrate de permitir los permisos necesarios.');
+                }
+            } else {
+                console.error('WebXR no está soportado en este navegador');
+                alert('Tu navegador no soporta WebXR. Usa Oculus Browser o Firefox Reality.');
+            }
+        });
+    </script>
 </body>
 </html>
